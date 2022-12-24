@@ -8,7 +8,7 @@ suppressPackageStartupMessages({
 
 bulk_type <- snakemake@wildcards[['bulk_type']]
 sc_type <- snakemake@wildcards[['sc_type']]
-params <- read_yaml("../../config.yml")
+params <- read_yaml("../config.yml")
 data_path <- params$data_path
 local_data_path <- params$local_data_path
 
@@ -24,7 +24,7 @@ colnames(bulk_matrix) <- genes
 # Get single cell data
 
 scefile <- paste(local_data_path, "/deconvolution_input/",
-                 "single_cell_data_", sc_type,".rds", sep = "/")
+                 "single_cell_data_", sc_type,".rds", sep = "")
 sce <- readRDS(scefile)
 rownames(sce) <- rowData(sce)$Symbol
 
@@ -47,7 +47,7 @@ sc.dat.filtered <- cleanup.genes(input = single_cell_matrix, input.type = "count
 # Filter to protein coding genes for faster computation
 sc.dat.filtered.pc <- select.gene.type(sc.dat.filtered, gene.type = "protein_coding")
 
-rm(single_cell_matrix, sc.dat.filtered); gc()
+rm(single_cell_matrix, sc.dat.filtered, sce, genes); gc()
 
 # Make prism object
 myPrism <- new.prism(reference = sc.dat.filtered.pc,
@@ -56,6 +56,8 @@ myPrism <- new.prism(reference = sc.dat.filtered.pc,
                      cell.type.labels = cell_types,
                      cell.state.labels = cell_states,
                      key="Epithelial cells")
+
+rm(sc.dat.filtered.pc); gc()
 
 bp.res <- run.prism(prism = myPrism, n.cores=6)
 theta <- get.fraction(bp = bp.res,
