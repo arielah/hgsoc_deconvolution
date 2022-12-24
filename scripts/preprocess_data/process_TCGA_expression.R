@@ -57,6 +57,13 @@ tcga_rna <- inner_join(master_gene_list, tcga_rna)
 tcga_rna$bulk_name <- NULL
 setnames(tcga_rna, "sc_name", "Gene")
 
+# Remove genes with NAs, these break BayesPrism
+nas_per_gene <- rowSums(is.na(tcga_rna))
+tcga_rna <- tcga_rna[which(nas_per_gene == 0), ]
+
+# Switch any negative values to 0, smallest value is approx. -1
+tcga_rna[tcga_rna < 0] <- 0
+
 outfile <- paste(local_data_path, "deconvolution_input",
                  "bulk_data_TCGA.tsv", sep= "/")
 write.table(tcga_rna, outfile, sep = "\t", row.names = F, quote = F)
