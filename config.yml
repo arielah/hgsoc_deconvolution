@@ -1,0 +1,6 @@
+data_path: "/Users/ariel/Documents/scRNA/sc-cancer-hgsc/data"
+local_data_path: "/Users/ariel/Documents/scRNA/hgsoc_deconvolution/data"
+plot_path: "/Users/ariel/Documents/scRNA/hgsoc_deconvolution/plots"
+figure_path: "/Users/ariel/Documents/scRNA/hgsoc_deconvolution/figures"
+pilot_data_path:
+sc_samples: ["16030X2","16030X3","16030X4","18389X2","19459X1","19595X1","19833X1","19833X2","2251","2267","2283","2293","2380","2467","2497","12162021","01132022"]
