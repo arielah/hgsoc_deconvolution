@@ -1,15 +1,12 @@
-# This snakefile runs deconvolution for each of the various packages we've implemented. 
+# This snakefile runs deconvolution using BayesPrism for each of our bulk datasets 
 
 # ---------
 # Variables
 # ---------
 
-# Bulk types: all sets of samples to deconvolve, including true bulk and pseudobulk.
-# True bulk types: We ran bulk RNA-seq on the samples in three separate ways: rRNA depletion on
-# tumor chunks, dissociation and then rRNA depletion, and dissociation and then polyA (3') capture.
-# Pseudobulk types: Different simulated pseudobulk datasets, derived from our single-cell data.
-# Methods: the deconvolution packages we have implemented. Citation in the corresponding R script.
-# Samples: the eight samples used in the pilot. This info is needed to run salmon.
+# Bulk types: all sets of samples to deconvolve.
+# SC types: different annotations of the single cell files. Default distinguishes between
+# fibroblasts and smooth muscle cells, fibro considers them the same cell type.
 # Threads: number of cores to run on.
 
 BULK_TYPES = ['AACES', 'TCGA']
@@ -18,13 +15,6 @@ THREADS = 6
 
 dir_results = "/home/ariel/Documents/scRNA/hgsoc_deconvolution/data/deconvolution_output/"
 dir_inputs = "/home/ariel/Documents/scRNA/hgsoc_deconvolution/data/deconvolution_input/"
-dir_bulk = "/home/ariel/Documents/scRNA/sc-cancer-hgsc/data/bulk_tumors"
-dir_single = "/home/ariel/Documents/scRNA/sc-cancer-hgsc/data/tumors"
-dir_index = "/home/ariel/Documents/scRNA/sc-cancer-hgsc/data/index"
-
-#wildcard_constraints:
-#	truebulktype="[A-Za-z]+_[A-Za-z]+",
-#	pseudobulktype="[A-Za-z]+"
 
 # --------
 # Workflow
@@ -44,5 +34,3 @@ rule run_bayesprism:
 		THREADS
 	script:
 		"run_bayesprism.R"
-
-
