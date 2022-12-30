@@ -13,7 +13,7 @@
 # Threads: number of cores to run on.
 
 BULK_TYPES = ['AACES', 'TCGA']
-SC_TYPES = ['default', 'fibro_merged'
+SC_TYPES = ['default', 'fibro']
 THREADS = 6
 
 dir_results = "/home/ariel/Documents/scRNA/hgsoc_deconvolution/data/deconvolution_output/"
@@ -46,8 +46,3 @@ rule run_bayesprism:
 		"run_bayesprism.R"
 
 
-# --------------
-# Helper scripts 
-# --------------
-
-# These scripts produce input files needed to run one or more deconvolution methods.

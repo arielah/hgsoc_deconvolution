@@ -12,6 +12,9 @@ params <- read_yaml("../config.yml")
 data_path <- params$data_path
 local_data_path <- params$local_data_path
 
+outdir <- paste(local_data_path, "/deconvolution_output/", bulk_type, "_", sc_type, sep = "")
+print(outdir)
+
 # Get bulk counts matrix
 bulk_matrix <- fread(paste(local_data_path, "/deconvolution_input/",
                            "bulk_data_", bulk_type, ".tsv", sep = ""),
@@ -65,7 +68,7 @@ theta <- get.fraction(bp = bp.res,
                       state.or.type = "type")
 
 # Save BayesPrism object for later perusal
-object_file <- paste(outdir, "bayesprism_results_full.rds", sep = "/")
+object_file <- paste(outdir, "_bayesprism_results_full.rds", sep = "")
 saveRDS(bp.res, file = object_file)
 
 # Format text version of proportion estimates
@@ -74,5 +77,5 @@ theta <- cbind(rownames(theta), theta)
 colnames(theta) <- c("cell_type", sample_names)
 
 # Save proportion estimates
-text_file <- paste(outdir, "bayesprism_results.tsv", sep = "/")
+text_file <- paste(outdir, "_bayesprism_results.tsv", sep = "")
 write.table(theta, file = text_file, sep = "\t", quote = F, row.names = F)
