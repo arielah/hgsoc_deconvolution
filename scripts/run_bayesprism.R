@@ -34,7 +34,9 @@ rownames(sce) <- rowData(sce)$Symbol
 gene_duplicates <- which(duplicated(rowData(sce)$Symbol))
 sce <- sce[-gene_duplicates, ]
 
-# Subset down to genes in bulk matrix
+# Subset down to genes in bulk matrix. Note that the bulk matrix was itself
+# subsetted in preprocess_data/process_*_expression.R based on the single
+# cell data, so there's no need for an intersection.
 sce <- sce[which(rownames(sce) %in% genes),]
 single_cell_matrix <- t(as.matrix(assay(sce)))
 

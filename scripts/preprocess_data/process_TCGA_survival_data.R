@@ -9,6 +9,8 @@ params <- read_yaml("../../config.yml")
 data_path <- params$data_path
 local_data_path <- params$local_data_path
 
+# I downloaded an xlsv file from GDC and then converted each
+# tab of the spreadsheet into a tsv file.
 tcga <- fread(paste(local_data_path, "TCGA",
                     "TCGA-CDR-SupplementalTableS1/TCGA-CDR-Table\ 1.tsv",
                     sep = "/"))

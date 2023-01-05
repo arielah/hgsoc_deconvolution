@@ -31,10 +31,10 @@ new_names <- str_extract(colnames(tcga_rna), "TCGA-\\w\\w-\\w\\w\\w\\w-\\w\\w\\w
 new_names[1] <- "gene_id"
 colnames(tcga_rna) <- new_names
 
-# The gene names in the data directly from TCGA are formatted like "ABCF1|23",
-# probably a mapping to an index I can't find on their website. Also, 29 of
-# them have question marks for names, e.g. "?|100133144". This separates out
-# only the HGNC symbols and removes the ? genes.
+# The gene names in this data are formatted as "hgnc_symbol|entrez_ID", and we
+# only want to use the hgnc symbols going forward. Any gene with ? probably has
+# an entrez id but not an hgnc symbol, and since those are unlikely to be
+# protein-coding genes which is what BayesPrism uses, we'll exclude them.
 gene_names <- strsplit(tcga_rna$gene_id, split = "\\|")
 gene_names <- sapply(gene_names, "[[", 1)
 tcga_rna$gene_id <- gene_names
