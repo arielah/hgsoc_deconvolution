@@ -1,0 +1,36 @@
+# This snakefile runs deconvolution using BayesPrism for each of our bulk datasets 
+
+# ---------
+# Variables
+# ---------
+
+# Bulk types: all sets of samples to deconvolve.
+# SC types: different annotations of the single cell files. Default distinguishes between
+# fibroblasts and smooth muscle cells, fibro considers them the same cell type.
+# Threads: number of cores to run on.
+
+BULK_TYPES = ['AACES', 'TCGA']
+SC_TYPES = ['default', 'fibro']
+THREADS = 6
+
+dir_results = "/home/ariel/Documents/scRNA/hgsoc_deconvolution/data/deconvolution_output/"
+dir_inputs = "/home/ariel/Documents/scRNA/hgsoc_deconvolution/data/deconvolution_input/"
+
+# --------
+# Workflow
+# --------
+
+rule all:
+	input:
+		expand(dir_results + "{bulk_type}_{sc_type}_bayesprism_results.tsv", bulk_type=BULK_TYPES, sc_type=SC_TYPES)
+
+rule run_bayesprism:
+	input:
+		dir_inputs + "single_cell_data_{sc_type}.rds",
+		dir_inputs + "bulk_data_{bulk_type}.tsv"
+	output:
+		dir_results + "{bulk_type}_{sc_type}_bayesprism_results.tsv"
+	threads: 
+		THREADS
+	script:
+		"run_bayesprism.R"
