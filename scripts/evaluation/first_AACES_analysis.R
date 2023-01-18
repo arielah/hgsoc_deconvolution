@@ -52,6 +52,7 @@ plot(aaces_t$survival_days, aaces_t$`T cells`, xlab="OS (days)", ylab="% T cells
 plot(aaces_t$survival_days, aaces_t$`B cells`, xlab="OS (days)", ylab="% B cells")
 
 # Put the samples into quartiles based on fibroblast content
+hist(aaces_t$Fibroblasts)
 quantiles <- quantile(aaces_t$Fibroblasts)
 q1 <- quantiles[2]
 q3 <- quantiles[4]

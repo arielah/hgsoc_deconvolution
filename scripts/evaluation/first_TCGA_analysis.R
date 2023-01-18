@@ -53,6 +53,7 @@ plot(tcga_master$OS.time, tcga_master$Fibroblasts, xlab="OS (days)", ylab="% Fib
 plot(tcga_master$OS.time, tcga_master$Macrophages, xlab="OS (days)", ylab="% Macrophages")
 
 # Put the samples into quartiles based on fibroblast content
+hist(tcga_master$Fibroblasts)
 quantiles <- quantile(tcga_master$Fibroblasts)
 q1 <- quantiles[2]
 q3 <- quantiles[4]
