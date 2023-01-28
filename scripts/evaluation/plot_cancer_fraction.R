@@ -5,6 +5,7 @@ suppressPackageStartupMessages({
   library(BayesPrism)
   library(umap)
   library(ggplot2)
+  library(stringr)
 })
 
 params <- read_yaml("../../config.yml")
@@ -21,12 +22,12 @@ if (length(args) == 1) {
 
 print(dataset)
 
-# Load AACES object
-aaces <- readRDS(paste(local_data_path, "deconvolution_output", 
-                       "AACES_default_bayesprism_results_full.rds", sep = "/"))
+# Load bayesprism object
+bp <- readRDS(paste(local_data_path, "/deconvolution_output/", dataset, 
+                       "_default_bayesprism_results_full.rds", sep = ""))
 
 # Get expression from only epithelial cell fraction
-epithelium <- get.exp(aaces, state.or.type = "type",
+epithelium <- get.exp(bp, state.or.type = "type",
                       cell.name = "Epithelial cells")
 
 # Get subtype annotations
@@ -44,9 +45,13 @@ epithelium_umap <- umap(epithelium)
 epithelium_umap <- as.data.frame(epithelium_umap[[1]])
 
 epithelium_umap$ID <- rownames(epithelium_umap)
+if (dataset == "TCGA") {
+  epithelium_umap$ID <- str_extract(epithelium_umap$ID, "TCGA-\\w\\w-\\w\\w\\w\\w")
+}
 
-epithelium_umap <- left_join(epithelium_umap, cluster_list)
+epithelium_umap <- inner_join(epithelium_umap, cluster_list)
 epithelium_umap$ClusterK4_kmeans <- as.factor(epithelium_umap$ClusterK4_kmeans)
+epithelium_umap$ClusterK3_kmeans <- as.factor(epithelium_umap$ClusterK3_kmeans)
 epithelium_umap$ClusterK2_kmeans <- as.factor(epithelium_umap$ClusterK2_kmeans)
 
 # Plot UMAP
@@ -69,7 +74,11 @@ epithelium_umap2 <- umap(epithelium)
 epithelium_umap2 <- as.data.frame(epithelium_umap2[[1]])
 
 setnames(epithelium_umap2, c("UMAP1", "UMAP2"))
-epithelium_umap <- cbind(epithelium_umap, epithelium_umap2)
+epithelium_umap2$ID <- rownames(epithelium_umap2)
+if (dataset == "TCGA") {
+  epithelium_umap2$ID <- str_extract(epithelium_umap2$ID, "TCGA-\\w\\w-\\w\\w\\w\\w")
+}
+epithelium_umap <- inner_join(epithelium_umap, epithelium_umap2)
 
 # Plot UMAP
 png(paste(plot_path, "/evaluation_plots/", dataset, "_cancer_fraction_seed2_K2.png", sep = ""))
