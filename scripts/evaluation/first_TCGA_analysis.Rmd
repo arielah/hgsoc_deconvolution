@@ -128,8 +128,13 @@ tcga_master$high_fibro <- ifelse(tcga_master$Fibroblasts > q3, 1, 0)
 
 ```{r}
 # Get Kaplan-Meier curves
-km <- Surv(time = tcga_master$PFI.time,  event = tcga_master$PFI)
+km <- Surv(time = tcga_master$OS.time,  event = tcga_master$OS)
 km_treatment<-survfit(km~high_fibro,data=tcga_master,type='kaplan-meier',conf.type='log')
+
+plotfile <- paste(plot_path, "evaluation_plots", "TCGA_KaplanMeier_fibroblasts.png", sep = "/")
+png(filename = plotfile)
+autoplot(km_treatment)
+dev.off()
 
 autoplot(km_treatment)
 ```

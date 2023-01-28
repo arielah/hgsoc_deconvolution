@@ -126,6 +126,11 @@ aaces_t$vitalstatus <- ifelse(aaces_t$vitalstatus=="Alive", 0, 1)
 km <- Surv(time = aaces_t$survival_days,  event = aaces_t$vitalstatus)
 km_treatment<-survfit(km~high_fibro,data=aaces_t,type='kaplan-meier',conf.type='log')
 
+plotfile <- paste(plot_path, "evaluation_plots", "AACES_KaplanMeier_fibroblasts.png", sep = "/")
+png(filename = plotfile)
+autoplot(km_treatment)
+dev.off()
+
 autoplot(km_treatment)
 ```
 
