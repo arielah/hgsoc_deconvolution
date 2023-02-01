@@ -1,0 +1,184 @@
+---
+title: "First Tothill analysis"
+author: "Ariel Hippen"
+date: '2023-02-01'
+output:
+  pdf_document:
+    toc: yes
+    toc_depth: '4'
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+Having run the TCGA tothill data through BayesPrism, this notebook compares the samples' cell type composition with their subtype annotations from the Way pipeline and the patients' survival status/time.
+
+```{r packages}
+suppressPackageStartupMessages({
+    library(data.table)
+    library(SingleCellExperiment)
+    library(dplyr)
+    library(yaml)
+    library(stringr)
+    library(ggplot2)
+    library(survival)
+    library(ggfortify)
+})
+
+params <- read_yaml("../../config.yml")
+data_path <- params$data_path
+local_data_path <- params$local_data_path
+plot_path <- params$plot_path
+```
+
+```{r load_tothill}
+tothill <- fread(paste(local_data_path, "deconvolution_output", 
+                    "tothill_default_bayesprism_results.tsv", sep = "/"))
+tothill_melt <- melt(tothill)
+```
+
+## Cell composition
+
+```{r plot}
+g <- ggplot(tothill_melt, mapping = aes(x=variable, y=value, fill=cell_type, color=cell_type)) +
+  geom_bar(stat = "identity") + 
+  theme(axis.text.x=element_blank(), #remove x axis labels
+        axis.ticks.x=element_blank(), #remove x axis ticks
+        axis.text.y=element_blank(),  #remove y axis labels
+        axis.ticks.y=element_blank()) #remove y axis ticks
+
+plotfile <- paste(plot_path, "evaluation_plots",
+                  "tothill_proportion_barchart.png", sep = "/")
+png(filename = plotfile, width = 1200)
+g
+dev.off()
+
+g
+```
+
+
+```{r}
+# Switch so cell types are columns and samples are rows for easier analysis
+cell_types <- tothill$cell_type
+
+tothill$cell_type <- NULL
+tothill_t <- t(as.matrix(tothill))
+colnames(tothill_t) <- cell_types
+tothill_t <- as.data.frame(tothill_t)
+```
+
+## Cell composition by survival
+
+```{r}
+# Load survival data
+tothill_survival <- fread(paste(local_data_path, "Tothill", "tothill_survival.tsv", 
+                             sep = "/"))
+```
+
+```{r}
+# Combine survival data with %
+tothill_t$unique_patient_ID <- rownames(tothill_t)
+tothill_master <- full_join(tothill_survival, tothill_t)
+
+tothill_master$Immune <- tothill_master$Macrophages + tothill_master$Monocytes + tothill_master$`Plasma cells` +
+  tothill_master$DC + tothill_master$`NK cells` + tothill_master$pDC + tothill_master$`B cells` + tothill_master$ILC +
+  tothill_master$`Mast cells`
+```
+
+```{r}
+g <- ggplot(tothill_master, mapping = aes(x=tothill_master$days_to_death, y=tothill_master$Fibroblasts)) +
+  geom_point() + xlab("OS (days)") + ylab("% Fibroblasts")
+plotfile <- paste(plot_path, "evaluation_plots", "tothill_survival_by_fibroblasts.png", sep = "/")
+png(filename = plotfile); g; dev.off()
+g
+
+g <- ggplot(tothill_master, mapping = aes(x=tothill_master$days_to_death, y=tothill_master$`Epithelial cells`)) +
+  geom_point() + xlab("OS (days)") + ylab("% Epithelial cells")
+plotfile <- paste(plot_path, "evaluation_plots", "tothill_survival_by_epithelial.png", sep = "/")
+png(filename = plotfile); g; dev.off()
+g
+
+g <- ggplot(tothill_master, mapping = aes(x=tothill_master$days_to_death, y=tothill_master$Immune)) +
+  geom_point() + xlab("OS (days)") + ylab("% Immune")
+plotfile <- paste(plot_path, "evaluation_plots", "tothill_survival_by_immune.png", sep = "/")
+png(filename = plotfile); g; dev.off()
+g
+
+g <- ggplot(tothill_master, mapping = aes(x=tothill_master$days_to_death, y=tothill_master$`Endothelial cells`)) +
+  geom_point() + xlab("OS (days)") + ylab("% Endothelial cells")
+plotfile <- paste(plot_path, "evaluation_plots", "tothill_survival_by_endothelial_cells.png", sep = "/")
+png(filename = plotfile); g; dev.off()
+g
+```
+
+## Kaplan Meier curves
+
+```{r}
+# Put the samples into quartiles based on fibroblast content
+ggplot(tothill_master, mapping = aes(x=Fibroblasts)) + geom_histogram()
+quantiles <- quantile(tothill_master$Fibroblasts)
+q1 <- quantiles[2]
+q3 <- quantiles[4]
+tothill_master$high_fibro <- ifelse(tothill_master$Fibroblasts > q3, 1, 0)
+```
+
+```{r}
+# Get Kaplan-Meier curves
+tothill_master$vital_status <- recode(tothill_master$vital_status,
+                                   "deceased"=1,
+                                   "living"=0)
+
+km <- Surv(time = tothill_master$days_to_death,  event = tothill_master$vital_status)
+km_treatment<-survfit(km~high_fibro,data=tothill_master,type='kaplan-meier',conf.type='log')
+
+plotfile <- paste(plot_path, "evaluation_plots", "tothill_KaplanMeier_fibroblasts.png", sep = "/")
+png(filename = plotfile)
+autoplot(km_treatment)
+dev.off()
+
+autoplot(km_treatment)
+```
+
+## Subtypes
+
+```{r}
+# Get subtype annotations
+cluster_file <- paste(local_data_path, "cluster_assignments", "FullClusterMembership.csv", sep = "/")
+cluster_list <- fread(cluster_file)
+
+setnames(cluster_list, "V1", "unique_patient_ID")
+
+tothill_t <- left_join(tothill_t, cluster_list)
+
+tothill_t$Subtype <- recode(tothill_t$ClusterK4_kmeans,
+                           "1" = "Mesenchymal",
+                           "2" = "Proliferative",
+                           "3" = "Immunoreactive",
+                           "4" = "Differentiated")
+
+tothill_t$Immune <- tothill_t$`T cells` + tothill_t$Macrophages + tothill_t$Monocytes + tothill_t$`Plasma cells` +
+  tothill_t$DC + tothill_t$`NK cells` + tothill_t$pDC + tothill_t$`B cells` + tothill_t$ILC + tothill_t$`Mast cells`
+```
+
+```{r}
+# Compare cell type proportions of subtypes
+g <- ggplot(tothill_t, mapping = aes(x=Subtype, y=Fibroblasts)) + geom_boxplot()
+plotfile <- paste(plot_path, "evaluation_plots", "tothill_fibroblasts_by_subtype.png", sep = "/")
+png(filename = plotfile); g; dev.off()
+g
+
+g <- ggplot(tothill_t, mapping = aes(x=Subtype, y=`Epithelial cells`)) + geom_boxplot()
+plotfile <- paste(plot_path, "evaluation_plots", "tothill_epithelial_by_subtype.png", sep = "/")
+png(filename = plotfile); g; dev.off()
+g
+
+g <- ggplot(tothill_t, mapping = aes(x=Subtype, y=Immune)) + geom_boxplot()
+plotfile <- paste(plot_path, "evaluation_plots", "tothill_immune_by_subtype.png", sep = "/")
+png(filename = plotfile); g; dev.off()
+g
+
+g <- ggplot(tothill_t, mapping = aes(x=Subtype, y=`Endothelial cells`)) + geom_boxplot()
+plotfile <- paste(plot_path, "evaluation_plots", "tothill_endothelial_by_subtype.png", sep = "/")
+png(filename = plotfile); g; dev.off()
+g
+```
