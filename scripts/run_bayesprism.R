@@ -13,7 +13,6 @@ data_path <- params$data_path
 local_data_path <- params$local_data_path
 
 outdir <- paste(local_data_path, "/deconvolution_output/", bulk_type, "_", sc_type, sep = "")
-print(outdir)
 
 # Get bulk counts matrix
 bulk_matrix <- fread(paste(local_data_path, "/deconvolution_input/",

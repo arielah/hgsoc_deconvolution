@@ -9,7 +9,7 @@
 # fibroblasts and smooth muscle cells, fibro considers them the same cell type.
 # Threads: number of cores to run on.
 
-BULK_TYPES = ['AACES', 'TCGA']
+BULK_TYPES = ['AACES', 'TCGA', 'microarray']
 SC_TYPES = ['default', 'fibro']
 THREADS = 6
 
