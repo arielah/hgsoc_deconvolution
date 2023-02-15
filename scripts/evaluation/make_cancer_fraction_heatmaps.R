@@ -104,9 +104,9 @@ annotation_row = data.frame(
 rownames(annotation_row) = kmeans$Sample
 
 plotname <- paste(local_data_path, "/evaluation_plots/",
-                  dataset, "_expression_heatmap.png")
+                  dataset, "_expression_heatmap.png", sep = "")
 png(plotname)
 pheatmap(epithelium, annotation_row = annotation_row,
-         show_colnames = F, show_rownames = F, scale = "column")
+         show_colnames = F, show_rownames = F)
 dev.off()
 
