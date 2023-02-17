@@ -54,6 +54,12 @@ epithelium_umap$ClusterK4_kmeans <- as.factor(epithelium_umap$ClusterK4_kmeans)
 epithelium_umap$ClusterK3_kmeans <- as.factor(epithelium_umap$ClusterK3_kmeans)
 epithelium_umap$ClusterK2_kmeans <- as.factor(epithelium_umap$ClusterK2_kmeans)
 
+epithelium_umap$ClusterK4_kmeans <- recode(epithelium_umap$ClusterK4_kmeans,
+                                           "1" = "Mesenchymal",
+                                           "2" = "Proliferative",
+                                           "3" = "Immunoreactive",
+                                           "4" = "Differentiated")
+
 # Plot UMAP
 png(paste(plot_path, "/evaluation_plots/", dataset, "_cancer_fraction_K2.png", sep = "")) 
 ggplot(data = epithelium_umap, mapping = aes(x = V1, y = V2, color = ClusterK2_kmeans)) + 
