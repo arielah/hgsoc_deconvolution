@@ -136,6 +136,22 @@ autoplot(km_treatment)
 
 ## Subtypes
 
+```{r}
+# Get subtype annotations
+cluster_file <- paste(local_data_path, "cluster_assignments", "FullClusterMembership.csv", sep = "/")
+cluster_list <- fread(cluster_file)
+
+cluster_list$V1 <- gsub("\\.", "-", cluster_list$V1)
+setnames(cluster_list, "V1", "ID")
+
+aaces_t <- left_join(aaces_t, cluster_list)
+```
+
+```{r}
+# Get rid of samples that don't have a subtype label
+aaces_t <- subset(aaces_t, !is.na(aaces_t$ClusterK4_kmeans))
+```
+
 
 ```{r}
 # Compare cell type proportions of subtypes
@@ -160,3 +176,26 @@ png(filename = plotfile); g; dev.off()
 g
 ```
 
+
+```{r}
+# Compare cell type proportions of subtypes for k=3
+g <- ggplot(aaces_t, mapping = aes(x=factor(ClusterK3_kmeans), y=Fibroblasts)) + geom_boxplot()
+plotfile <- paste(plot_path, "evaluation_plots", "AACES_fibroblasts_by_subtype_k3.png", sep = "/")
+png(filename = plotfile); g; dev.off()
+g
+
+g <- ggplot(aaces_t, mapping = aes(x=factor(ClusterK3_kmeans), y=`Epithelial cells`)) + geom_boxplot()
+plotfile <- paste(plot_path, "evaluation_plots", "AACES_epithelial_by_subtype_k3.png", sep = "/")
+png(filename = plotfile); g; dev.off()
+g 
+
+g <- ggplot(aaces_t, mapping = aes(x=factor(ClusterK3_kmeans), y=Immune)) + geom_boxplot()
+plotfile <- paste(plot_path, "evaluation_plots", "AACES_immune_by_subtype_k3.png", sep = "/")
+png(filename = plotfile); g; dev.off()
+g
+
+g <- ggplot(aaces_t, mapping = aes(x=factor(ClusterK3_kmeans), y=`Endothelial cells`)) + geom_boxplot()
+plotfile <- paste(plot_path, "evaluation_plots", "AACES_endothelial_by_subtype_k3.png", sep = "/")
+png(filename = plotfile); g; dev.off()
+g
+```

@@ -182,3 +182,27 @@ plotfile <- paste(plot_path, "evaluation_plots", "tothill_endothelial_by_subtype
 png(filename = plotfile); g; dev.off()
 g
 ```
+
+
+```{r}
+# Compare cell type proportions of subtypes for k=3
+g <- ggplot(tothill_t, mapping = aes(x=factor(ClusterK3_kmeans), y=Fibroblasts)) + geom_boxplot()
+plotfile <- paste(plot_path, "evaluation_plots", "tothill_fibroblasts_by_subtype_k3.png", sep = "/")
+png(filename = plotfile); g; dev.off()
+g
+
+g <- ggplot(tothill_t, mapping = aes(x=factor(ClusterK3_kmeans), y=`Epithelial cells`)) + geom_boxplot()
+plotfile <- paste(plot_path, "evaluation_plots", "tothill_epithelial_by_subtype_k3.png", sep = "/")
+png(filename = plotfile); g; dev.off()
+g
+
+g <- ggplot(tothill_t, mapping = aes(x=factor(ClusterK3_kmeans), y=Immune)) + geom_boxplot()
+plotfile <- paste(plot_path, "evaluation_plots", "tothill_immune_by_subtype_k3.png", sep = "/")
+png(filename = plotfile); g; dev.off()
+g
+
+g <- ggplot(tothill_t, mapping = aes(x=factor(ClusterK3_kmeans), y=`Endothelial cells`)) + geom_boxplot()
+plotfile <- paste(plot_path, "evaluation_plots", "tothill_endothelial_by_subtype_k3.png", sep = "/")
+png(filename = plotfile); g; dev.off()
+g
+```
