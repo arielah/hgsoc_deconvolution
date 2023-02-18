@@ -122,7 +122,8 @@ model
 
 ```{r}
 # Analysis with covariates
-model <- coxph(Surv(months, vital) ~ (factor(high_fibro)+ factor(age)+ factor(debulking)+ factor(FewerStage)), aaces)
+model <- coxph(Surv(months, vital) ~ (factor(high_fibro)+ factor(age)+
+                                        factor(debulking)+ factor(FewerStage)), aaces)
 model
 ```
 
@@ -150,7 +151,8 @@ model
 
 ```{r}
 # Analysis with covariates
-model <- coxph(Surv(months, vital) ~ (factor(high_fibro)+ factor(age)+ factor(debulking)+ factor(FewerStage)), tcga)
+model <- coxph(Surv(months, vital) ~ (factor(high_fibro)+ factor(age)+
+                                        factor(debulking)+ factor(FewerStage)), tcga)
 model
 ```
 
@@ -177,7 +179,8 @@ model
 
 ```{r}
 # Analysis with covariates
-model <- coxph(Surv(months, vital) ~ (factor(high_fibro)+ factor(age)+ factor(debulking)+ factor(FewerStage)), tothill)
+model <- coxph(Surv(months, vital) ~ (factor(high_fibro)+ factor(age)+ 
+                                        factor(debulking)+factor(FewerStage)), tothill)
 model
 ```
 
@@ -200,7 +203,8 @@ model
 
 ```{r}
 # Analysis with covariates
-model <- coxph(Surv(months, vital) ~ (factor(high_fibro)+ factor(Dataset)+ factor(age) + factor(debulking) + factor(FewerStage)), composition)
+model <- coxph(Surv(months, vital) ~ (factor(high_fibro)+ factor(Dataset)+ factor(age)+
+                                        factor(debulking) + factor(FewerStage)), composition)
 model
 ```
 ```{r}
