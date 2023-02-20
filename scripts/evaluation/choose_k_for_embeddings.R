@@ -1,3 +1,10 @@
+# BayesPrism has a built in function to run NMF and try and find distinct transcriptional
+# programs within the cancer fraction, once the stromal fraction has been computationally
+# removed. To do this as with any NMF, you need to select a value of k for the number of
+# latent embeddings. This script generates plots to assess the dispersion of the data and
+# is based off the BayesPrism tutorial: 
+# https://github.com/Danko-Lab/BayesPrism/blob/main/tutorial_embedding_learning.html
+
 suppressPackageStartupMessages({
   library(data.table)
   library(SingleCellExperiment)
