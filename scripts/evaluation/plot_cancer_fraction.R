@@ -30,6 +30,13 @@ bp <- readRDS(paste(local_data_path, "/deconvolution_output/", dataset,
 epithelium <- get.exp(bp, state.or.type = "type",
                       cell.name = "Epithelial cells")
 
+# Get full expression data
+full <- fread(paste(local_data_path, "/deconvolution_input/bulk_data_", dataset,
+                    ".tsv", sep=""))
+genes <- full$Gene; full$Gene <- NULL
+full <- t(full)
+colnames(full) <- genes
+
 # Get subtype annotations
 cluster_file <- paste(local_data_path, "cluster_assignments", "FullClusterMembership.csv", sep = "/")
 cluster_list <- fread(cluster_file)
@@ -97,5 +104,41 @@ ggplot(data = epithelium_umap, mapping = aes(x = UMAP1, y = UMAP2, color = Clust
 dev.off()
 png(paste(plot_path, "/evaluation_plots/", dataset, "_cancer_fraction_seed2_K4.png", sep = ""))
 ggplot(data = epithelium_umap, mapping = aes(x = UMAP1, y = UMAP2, color = ClusterK4_kmeans)) + 
+  geom_point() + ggtitle("Cancer Fraction Expression") + xlab("UMAP 1") + ylab("UMAP 2")
+dev.off()
+
+
+# Calculate UMAP on full data
+set.seed(109)
+full_umap <- umap(full)
+full_umap <- as.data.frame(full_umap[[1]])
+
+full_umap$ID <- rownames(full_umap)
+if (dataset == "TCGA") {
+  full_umap$ID <- str_extract(full_umap$ID, "TCGA-\\w\\w-\\w\\w\\w\\w")
+}
+
+full_umap <- inner_join(full_umap, cluster_list)
+full_umap$ClusterK4_kmeans <- as.factor(full_umap$ClusterK4_kmeans)
+full_umap$ClusterK3_kmeans <- as.factor(full_umap$ClusterK3_kmeans)
+full_umap$ClusterK2_kmeans <- as.factor(full_umap$ClusterK2_kmeans)
+
+full_umap$ClusterK4_kmeans <- recode(full_umap$ClusterK4_kmeans,
+                                           "1" = "Mesenchymal",
+                                           "2" = "Proliferative",
+                                           "3" = "Immunoreactive",
+                                           "4" = "Differentiated")
+
+# Plot UMAP
+png(paste(plot_path, "/evaluation_plots/", dataset, "_sample_UMAP_K2.png", sep = "")) 
+ggplot(data = full_umap, mapping = aes(x = V1, y = V2, color = ClusterK2_kmeans)) + 
+  geom_point() + ggtitle("Cancer Fraction Expression") + xlab("UMAP 1") + ylab("UMAP 2")
+dev.off()
+png(paste(plot_path, "/evaluation_plots/", dataset, "_sample_UMAP_K3.png", sep = ""))
+ggplot(data = full_umap, mapping = aes(x = V1, y = V2, color = ClusterK3_kmeans)) + 
+  geom_point() + ggtitle("Cancer Fraction Expression") + xlab("UMAP 1") + ylab("UMAP 2")
+dev.off()
+png(paste(plot_path, "/evaluation_plots/", dataset, "_sample_UMAP_K4.png", sep = ""))
+ggplot(data = full_umap, mapping = aes(x = V1, y = V2, color = ClusterK4_kmeans)) + 
   geom_point() + ggtitle("Cancer Fraction Expression") + xlab("UMAP 1") + ylab("UMAP 2")
 dev.off()
