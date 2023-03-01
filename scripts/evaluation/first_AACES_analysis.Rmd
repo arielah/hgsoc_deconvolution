@@ -204,12 +204,12 @@ plotfile <- paste(plot_path, "evaluation_plots", "AACES_immune_by_subtype_k3.png
 png(filename = plotfile); g; dev.off()
 g
 
-g <- ggplot(aaces_t, mapping = aes(x=ClusterK3_kmeans, y=Macrophages)) + geom_boxplot()
+g <- ggplot(aaces_t, mapping = aes(x=factor(ClusterK3_kmeans), y=Macrophages)) + geom_boxplot()
 plotfile <- paste(plot_path, "evaluation_plots", "AACES_macrophages_by_subtype_k3.png", sep = "/")
 png(filename = plotfile); g; dev.off()
 g
 
-g <- ggplot(aaces_t, mapping = aes(x=ClusterK3_kmeans, y=`T cells`)) + geom_boxplot()
+g <- ggplot(aaces_t, mapping = aes(x=factor(ClusterK3_kmeans), y=`T cells`)) + geom_boxplot()
 plotfile <- paste(plot_path, "evaluation_plots", "AACES_tcells_by_subtype_k3.png", sep = "/")
 png(filename = plotfile); g; dev.off()
 g
