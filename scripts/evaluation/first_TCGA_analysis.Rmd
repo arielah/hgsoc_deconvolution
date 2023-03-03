@@ -163,6 +163,12 @@ tcga_t$Immune <- tcga_t$`T cells` + tcga_t$Macrophages + tcga_t$Monocytes + tcga
   tcga_t$DC + tcga_t$`NK cells` + tcga_t$pDC + tcga_t$`B cells` + tcga_t$ILC + tcga_t$`Mast cells`
 ```
 
+
+```{r}
+# Get rid of samples that don't have a subtype label
+tcga_t <- subset(tcga_t, !is.na(tcga_t$Subtype))
+```
+
 ```{r}
 # Compare cell type proportions of subtypes
 g <- ggplot(tcga_t, mapping = aes(x=Subtype, y=Fibroblasts)) + geom_boxplot()
@@ -180,9 +186,51 @@ plotfile <- paste(plot_path, "evaluation_plots", "TCGA_immune_by_subtype.png", s
 png(filename = plotfile); g; dev.off()
 g
 
+g <- ggplot(tcga_t, mapping = aes(x=Subtype, y=Macrophages)) + geom_boxplot()
+plotfile <- paste(plot_path, "evaluation_plots", "TCGA_macrophages_by_subtype.png", sep = "/")
+png(filename = plotfile); g; dev.off()
+g
+
+g <- ggplot(tcga_t, mapping = aes(x=Subtype, y=`T cells`)) + geom_boxplot()
+plotfile <- paste(plot_path, "evaluation_plots", "TCGA_tcells_by_subtype.png", sep = "/")
+png(filename = plotfile); g; dev.off()
+g
+
 g <- ggplot(tcga_t, mapping = aes(x=Subtype, y=`Endothelial cells`)) + geom_boxplot()
 plotfile <- paste(plot_path, "evaluation_plots", "TCGA_endothelial_by_subtype.png", sep = "/")
 png(filename = plotfile); g; dev.off()
 g
 ```
 
+```{r}
+# Compare cell type proportions of subtypes for k=3
+g <- ggplot(tcga_t, mapping = aes(x=factor(ClusterK3_kmeans), y=Fibroblasts)) + geom_boxplot()
+plotfile <- paste(plot_path, "evaluation_plots", "TCGA_fibroblasts_by_subtype_k3.png", sep = "/")
+png(filename = plotfile); g; dev.off()
+g
+
+g <- ggplot(tcga_t, mapping = aes(x=factor(ClusterK3_kmeans), y=`Epithelial cells`)) + geom_boxplot()
+plotfile <- paste(plot_path, "evaluation_plots", "TCGA_epithelial_by_subtype_k3.png", sep = "/")
+png(filename = plotfile); g; dev.off()
+g
+
+g <- ggplot(tcga_t, mapping = aes(x=factor(ClusterK3_kmeans), y=Immune)) + geom_boxplot()
+plotfile <- paste(plot_path, "evaluation_plots", "TCGA_immune_by_subtype_k3.png", sep = "/")
+png(filename = plotfile); g; dev.off()
+g
+
+g <- ggplot(tcga_t, mapping = aes(x=factor(ClusterK3_kmeans), y=Macrophages)) + geom_boxplot()
+plotfile <- paste(plot_path, "evaluation_plots", "TCGA_macrophages_by_subtype_k3.png", sep = "/")
+png(filename = plotfile); g; dev.off()
+g
+
+g <- ggplot(tcga_t, mapping = aes(x=factor(ClusterK3_kmeans), y=`T cells`)) + geom_boxplot()
+plotfile <- paste(plot_path, "evaluation_plots", "TCGA_tcells_by_subtype_k3.png", sep = "/")
+png(filename = plotfile); g; dev.off()
+g
+
+g <- ggplot(tcga_t, mapping = aes(x=factor(ClusterK3_kmeans), y=`Endothelial cells`)) + geom_boxplot()
+plotfile <- paste(plot_path, "evaluation_plots", "TCGA_endothelial_by_subtype_k3.png", sep = "/")
+png(filename = plotfile); g; dev.off()
+g
+```
