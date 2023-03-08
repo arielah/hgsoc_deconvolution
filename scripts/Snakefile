@@ -10,7 +10,7 @@
 # Threads: number of cores to run on.
 
 BULK_TYPES = ['AACES', 'TCGA', 'microarray', 'tothill']
-SC_TYPES = ['default', 'fibro']
+SC_TYPES = ['default', 'fibro', 'vazquez']
 THREADS = 6
 
 dir_results = "/home/ariel/Documents/scRNA/hgsoc_deconvolution/data/deconvolution_output/"
