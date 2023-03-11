@@ -129,7 +129,7 @@ plotfile <- paste(plot_path, "/evaluation_plots/", dataset, "_endothelial_by_sub
 png(filename = plotfile); g; dev.off()
 g
 
-g <- ggplot(data_t, mapping = aes(x=as.factor(ClusterK3_kmeans), y=Fibroblasts)) + geom_boxplot()
+g <- ggplot(data_t, mapping = aes(x=factor(ClusterK3_kmeans), y=Fibroblasts)) + geom_boxplot()
 plotfile <- paste(plot_path, "/evaluation_plots/", dataset, "_fibroblasts_by_subtype_vazquez_k3.png", sep = "")
 png(filename = plotfile); g; dev.off()
 g

@@ -20,13 +20,13 @@ local_data_path <- params$local_data_path
 plot_path <- params$plot_path
 
 # Get list of cells with cell type labels
-cell_types <- fread(paste(local_data_path, "Vazquez-Garcia", 
+cells_with_cell_types <- fread(paste(local_data_path, "Vazquez-Garcia", 
                           "GSE180661_GEO_cells.tsv.gz", sep = "/"))
 
 # Take random sample of cells
 set.seed(302)
-sample_indices <- sample(1:nrow(cell_types), size = 100000)
-kept_cells <- cell_types[sample_indices, ]
+sample_indices <- sample(1:nrow(cells_with_cell_types), size = 100000)
+kept_cells <- cells_with_cell_types[sample_indices, ]
 
 # Iterate through all file chunks
 parts <- list.files(path = paste(local_data_path, "Vazquez-Garcia", sep = "/"), pattern = "part_*")

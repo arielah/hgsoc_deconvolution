@@ -14,6 +14,11 @@ import os
 with open('../../config.yml', 'r') as cfg:
     params = yaml.safe_load(cfg)
 
+
+# Number of cells per chunk. R definitely can't handle 1.3 million at a time,
+# it could probably do 200K at a time but I decided not to push it.
+chunk_size = 100000
+
 # Load data
 infile = os.path.join(params["local_data_path"],
                       "Vazquez-Garcia",
@@ -46,10 +51,6 @@ mtx_list = []
 # Iterate through the cells
 for i in range(len(indptr)-1):
 
-    # Progress tracker, can be deleted
-    if i % 1000 == 0:
-        print(i)
-
     # Format data in mtx format: row number, column number, value
     index_left = indptr[i]
     index_right = indptr[i+1]
@@ -60,13 +61,13 @@ for i in range(len(indptr)-1):
     mtx_list.append(mini_mtx)
         
     # Write file every 100000 cells or at the end of the file
-    if (i % 100000 == 0 and i > 0) or i == len(indptr)-2:
+    if (i % chunk_size == 0 and i > 0) or i == len(indptr)-2:
 
         # Create directory for this chunk called "part_x"
-        if i % 100000 == 0:
-            partno = int(i / 100000)
+        if i % chunk_size == 0:
+            partno = int(i / chunk_size)
         elif i == len(indptr) - 2:
-            partno = int(i / 100000) + 1
+            partno = int(i / chunk_size) + 1
         partdir = "part_" + str(partno)
         chunkpath = os.path.join(outdir, partdir)
         os.makedirs(chunkpath, exist_ok=True)
@@ -77,6 +78,9 @@ for i in range(len(indptr)-1):
 
         with open(chunkfile, 'a') as o:
             # Write header so downstream package recognizes it as an mtx file
+            # Coordinate shows it's listing row # and column #, not a 2D array
+            # Integer means to expect all values to be integers (read counts)
+            # General means there's not a symmetry constraint for the matrix
             o.write("%%MatrixMarket matrix coordinate integer general\n")
 
             # First line of mtx file is the total number of rows, cols, and
