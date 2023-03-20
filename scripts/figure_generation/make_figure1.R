@@ -5,19 +5,13 @@ suppressPackageStartupMessages({
   library(yaml)
 })
 
+source("figure_utils.R")
+
 params <- read_yaml("../../config.yml")
 data_path <- params$data_path
 local_data_path <- params$local_data_path
 plot_path <- params$plot_path
 figure_path <- params$figure_path
-
-theme_set(theme_bw() +
-              theme(text = element_text(size = 14),
-                    strip.background = element_rect(colour = "black",
-                                                    fill = "white"),
-                    plot.title = element_text(hjust = 0.5)
-              )
-)
 
 generate_barplot <- function(bulk_set, sc_set, title_tmp, taglet) {
   
@@ -25,6 +19,12 @@ generate_barplot <- function(bulk_set, sc_set, title_tmp, taglet) {
                          bulk_set, "_", sc_set, "_bayesprism_results.tsv",
                          sep = ""))
   results_melt <- melt(results)
+  
+  if (sc_set == "fibro"){
+      ylab = "Proportion (HGSOC Penn/Utah reference)"
+  } else{
+      ylab = "Proportion (Vázquez-García reference)"
+  }
   
   g <- ggplot(results_melt, mapping = aes(x=variable, y=value, fill=cell_type, color=cell_type)) +
     geom_bar(stat = "identity") +
@@ -36,7 +36,11 @@ generate_barplot <- function(bulk_set, sc_set, title_tmp, taglet) {
           axis.ticks.y=element_blank(), #remove y axis ticks
           panel.background = element_blank(),
           axis.title.x = element_text(vjust = 1)
-    )
+    ) +
+    scale_x_discrete(expand = c(0, 0)) +
+    scale_y_discrete(expand = c(0, 0)) +
+    scale_fill_manual(values = colors_celltypes) +
+    scale_color_manual(values = colors_celltypes)
   
   g
 }

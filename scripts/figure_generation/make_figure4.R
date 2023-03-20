@@ -9,19 +9,13 @@ suppressPackageStartupMessages({
     library(yaml)
 })
 
+source("figure_utils.R")
+
 params <- read_yaml("../../config.yml")
 data_path <- params$data_path
 local_data_path <- params$local_data_path
 plot_path <- params$plot_path
 figure_path <- params$figure_path
-
-theme_set(theme_bw() +
-              theme(text = element_text(size = 14),
-                    strip.background = element_rect(colour = NA,
-                                                    fill = "white"),
-                    plot.title = element_text(hjust = 0.5)
-              )
-)
 
 load_datasets <- function(bulk_set, sc_set) {
     results_t <- fread(paste(local_data_path, "/deconvolution_output/", bulk_set,
@@ -70,11 +64,11 @@ tothill <- inner_join(tothill, covariates)
 composition <- rbind(tcga, microarray, tothill)
 
 kaplan_meier <- function(data, title, tag) {
-    quantiles <- quantile(data$Immune)
+    quantiles <- quantile(data$Fibroblasts)
     q1 <- quantiles[2]
     median <- quantiles[3]
     q3 <- quantiles[4]
-    data$high_fibro <- ifelse(data$Immune > q3, "High immune", "Other")
+    data$high_fibro <- ifelse(data$Fibroblasts > q3, "High fibroblast", "Other")
     
     km <- Surv(data$months, data$vital)
     km_treatment<-survfit(km~high_fibro,data=data,type='kaplan-meier',conf.type='log')
@@ -82,7 +76,8 @@ kaplan_meier <- function(data, title, tag) {
     autoplot(km_treatment, conf.int = F) +
         labs(x="Time since diagnosis (months)", y = "Survival",
              title = title, tag = tag) +
-        theme(legend.title=element_blank())
+        theme(legend.title=element_blank()) +
+        scale_color_manual(values=c("#ED0000","#00AAB4"))
     }
 
 pA <- kaplan_meier(tcga, "TCGA RNA-seq", "A")
@@ -97,10 +92,12 @@ surgery <- subset(composition, !is.na(composition$debulking))
 
 pE <- ggplot(surgery, mapping = aes(y=Fibroblasts, x=dataset, fill=debulking)) +
     geom_boxplot(notch=TRUE) +
+    scale_fill_manual(values = c("#42B450", "#925E9F")) +
     labs(x="Dataset", fill="Debulking status", tag="E")
 
 pF <- ggplot(surgery, mapping = aes(y=Immune, x=dataset, fill=debulking)) +
     geom_boxplot(notch=TRUE) +
+    scale_fill_manual(values = c("#42B450", "#925E9F")) +
     labs(x="Dataset", fill="Debulking status", tag="F")
 
 bottom <- pE + pF + plot_layout(guides="collect")
@@ -109,9 +106,31 @@ pdf(paste(figure_path, "figure4.pdf", sep = "/"), width = 12, height = 14, famil
 top / bottom + plot_layout(heights = c(2, 1))
 dev.off()
 
-# Delete this later, checking the notch
-#optimal <- subset(surgery, surgery$debulking=="optimal")
-#suboptimal <- subset(surgery, surgery$debulking=="suboptimal")
 
-#median(optimal$Fibroblasts) + 1.5 * IQR(optimal$Fibroblasts) / sqrt(nrow(optimal))
-#median(suboptimal$Fibroblasts) - 1.5 * IQR(suboptimal$Fibroblasts) / sqrt(nrow(suboptimal))
+plot_histogram <- function(data, bulk_set, cell_type, lab) {
+    if (cell_type == "Fibroblasts") {
+        data$celltype <- data$Fibroblasts
+    } else if (cell_type == "Immune") {
+        data$celltype <- data$Immune
+    }
+    quantiles <- quantile(data$celltype)
+    q1 <- quantiles[2]
+    median <- quantiles[3]
+    q3 <- quantiles[4]
+    
+    ggplot(data, mapping = aes(x=celltype))  + geom_histogram() +
+        geom_vline(xintercept = q3, linetype = "dashed", color = "red") +
+        labs(title = bulk_set, tag = lab, x = cell_type, y = "Count")
+}
+
+qA <- plot_histogram(tcga, "TCGA RNA-seq", "Fibroblasts", "A")
+qB <- plot_histogram(microarray, "TCGA Microarray", "Fibroblasts", "B")
+qC <- plot_histogram(tothill, "Tothill", "Fibroblasts", "C")
+
+qD <- plot_histogram(tcga, "TCGA RNA-seq", "Immune", "D")
+qE <- plot_histogram(microarray, "TCGA Microarray", "Immune", "E")
+qF <- plot_histogram(tothill, "Tothill", "Immune", "F")
+
+pdf(paste(figure_path, "suppfig1.pdf", sep = "/"), width = 18, height = 12, family = "sans")
+qA + qB + qC + qD + qE + qF + plot_layout(nrow = 2)
+dev.off()

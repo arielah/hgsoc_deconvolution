@@ -7,7 +7,7 @@ suppressPackageStartupMessages({
   library(yaml)
 })
 
-options(encoding = "UTF-8")
+source("figure_utils.R")
 
 params <- read_yaml("../../config.yml")
 data_path <- params$data_path
@@ -61,7 +61,7 @@ pB <- ggplot(microarray, mapping = aes(x=fibro, y=vazquez, color=cell_type)) +
   labs(x="Proportions with HGSOC Penn/Utah reference", 
        y="Proportions with Vázquez-García reference",
        title = "TCGA Microarray",
-       color="Cell type", tag = "A")
+       color="Cell type", tag = "B")
 
 tothill <- full_join(tothill_ours, tothill_vazquez)
 pC <- ggplot(tothill, mapping = aes(x=fibro, y=vazquez, color=cell_type)) +
@@ -69,7 +69,7 @@ pC <- ggplot(tothill, mapping = aes(x=fibro, y=vazquez, color=cell_type)) +
   labs(x="Proportions with HGSOC Penn/Utah reference", 
        y="Proportions with Vázquez-García reference",
        title = "Tothill",
-       color="Cell type", tag = "A")
+       color="Cell type", tag = "C")
 
 # Compare TCGA and microarray
 
