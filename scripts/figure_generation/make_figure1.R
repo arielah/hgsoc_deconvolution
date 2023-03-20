@@ -30,10 +30,10 @@ generate_barplot <- function(bulk_set, sc_set, title_tmp, taglet) {
     geom_bar(stat = "identity") +
     labs(x="Sample", y="Proportion", fill="Cell type", colour="Cell type",
          tag = taglet, title = title_tmp) +
-    theme(axis.text.x=element_blank(), #remove x axis labels
-          axis.ticks.x=element_blank(), #remove x axis ticks
-          axis.text.y=element_blank(),  #remove y axis labels
-          axis.ticks.y=element_blank(), #remove y axis ticks
+    theme(axis.text.x=element_blank(),
+          axis.ticks.x=element_blank(),
+          axis.text.y=element_blank(),
+          axis.ticks.y=element_blank(),
           panel.background = element_blank(),
           axis.title.x = element_text(vjust = 1)
     ) +
@@ -53,7 +53,6 @@ pE <- generate_barplot("microarray", "vazquez", "TCGA Microarray", "E")
 pF <- generate_barplot("tothill", "vazquez", "Tothill", "F")
 
 top <- pA + pB + pC + plot_layout(guides = "collect")
-
 bottom <- pD + pE + pF + plot_layout(guides = "collect")
 
 pdf(paste(figure_path, "figure1.pdf", sep = "/"), width = 18, height = 12, family = "sans")

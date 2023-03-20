@@ -36,7 +36,7 @@ microarray <- load_data("microarray", 3)
 tothill <- load_data("tothill", 3)
 
 # Load subtype assignments
-cluster_file <- paste(local_data_path, "cluster_assignments", "FullClusterMembership.csv", sep = "/")
+cluster_file <- paste(local_data_path, "cluster_assignments", "noAACES_FullClusterMembership.csv", sep = "/")
 cluster_list <- fread(cluster_file)
 cluster_list <- cluster_list[order(cluster_list$ClusterK4_kmeans),]
 

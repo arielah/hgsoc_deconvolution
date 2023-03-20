@@ -51,7 +51,7 @@ load_datasets <- function() {
 everything <- load_datasets()
 
 # Get subtype annotations
-cluster_file <- paste(local_data_path, "cluster_assignments", "FullClusterMembership.csv", sep = "/")
+cluster_file <- paste(local_data_path, "cluster_assignments", "noAACES_FullClusterMembership.csv", sep = "/")
 cluster_list <- fread(cluster_file)
 cluster_list$Dataset <- NULL
 setnames(cluster_list, "V1", "Sample")
