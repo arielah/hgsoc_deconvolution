@@ -15,14 +15,6 @@ local_data_path <- params$local_data_path
 plot_path <- params$plot_path
 figure_path <- params$figure_path
 
-theme_set(theme_bw() +
-              theme(text = element_text(size = 14),
-                    strip.background = element_rect(colour = "black",
-                                                    fill = "white"),
-                    plot.title = element_text(hjust = 0.5)
-              )
-)
-
 load_dataset <- function(bulk_set, sc_set) {
   results <- fread(paste(local_data_path, "/deconvolution_output/",
                          bulk_set, "_", sc_set, "_bayesprism_results.tsv",
@@ -48,7 +40,7 @@ tothill_vazquez <- load_dataset("tothill", "vazquez")
 
 tcga <- full_join(tcga_ours, tcga_vazquez)
 pA <- ggplot(tcga, mapping = aes(x=fibro, y=vazquez, color=cell_type)) + 
-  geom_point() + geom_abline() +
+  geom_point(size = 0.8) + geom_abline() +
   labs(x="Proportions with HGSOC Penn/Utah reference", 
        y="Proportions with Vázquez-García reference",
        title = "TCGA RNA-seq",
@@ -57,7 +49,7 @@ pA <- ggplot(tcga, mapping = aes(x=fibro, y=vazquez, color=cell_type)) +
 
 microarray <- full_join(microarray_ours, microarray_vazquez)
 pB <- ggplot(microarray, mapping = aes(x=fibro, y=vazquez, color=cell_type)) +
-  geom_point() + geom_abline() +
+  geom_point(size = 0.8) + geom_abline() +
   labs(x="Proportions with HGSOC Penn/Utah reference", 
        y="Proportions with Vázquez-García reference",
        title = "TCGA Microarray",
@@ -65,7 +57,7 @@ pB <- ggplot(microarray, mapping = aes(x=fibro, y=vazquez, color=cell_type)) +
 
 tothill <- full_join(tothill_ours, tothill_vazquez)
 pC <- ggplot(tothill, mapping = aes(x=fibro, y=vazquez, color=cell_type)) +
-  geom_point() + geom_abline() +
+  geom_point(size = 0.8) + geom_abline() +
   labs(x="Proportions with HGSOC Penn/Utah reference", 
        y="Proportions with Vázquez-García reference",
        title = "Tothill",
@@ -81,7 +73,7 @@ setnames(microarray_ours, "fibro", "microarray")
 
 tcga_both <- inner_join(tcga_ours, microarray_ours)
 pD <- ggplot(tcga_both, mapping = aes(x=microarray, y=rnaseq, color=cell_type)) +
-  geom_point() + geom_abline() +
+  geom_point(size = 0.8) + geom_abline() +
   labs(x="TCGA Microarray Proportions", y="TCGA RNA-seq Proportions",
        color="Cell type", tag = "D",
        title = "Cross-plaform comparison")

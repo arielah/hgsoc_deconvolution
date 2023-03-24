@@ -51,7 +51,7 @@ load_datasets <- function() {
 everything <- load_datasets()
 
 # Get subtype annotations
-cluster_file <- paste(local_data_path, "cluster_assignments", "noAACES_FullClusterMembership.csv", sep = "/")
+cluster_file <- paste(local_data_path, "cluster_assignments", "FullClusterMembership.csv", sep = "/")
 cluster_list <- fread(cluster_file)
 cluster_list$Dataset <- NULL
 setnames(cluster_list, "V1", "Sample")
@@ -82,15 +82,15 @@ pA <- ggplot(everything) +
     scale_fill_manual(values = colors_bulktypes) +
     labs(x = "Subtype (k = 4)", tag = "A")
 pB <- ggplot(everything) + geom_boxplot(mapping = aes(x = Subtype, y = `Epithelial cells`, fill = Dataset)) +
-    theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1)) +
+    theme(axis.text.x = element_text(angle = 30, vjust = 1, hjust = 1)) +
     scale_fill_manual(values = colors_bulktypes) +
     labs(x = "Subtype (k = 4)", tag = "B")
 pC <- ggplot(everything) + geom_boxplot(mapping = aes(x = Subtype, y = `Endothelial cells`, fill = Dataset)) +
-    theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1)) +
+    theme(axis.text.x = element_text(angle = 30, vjust = 1, hjust = 1)) +
     scale_fill_manual(values = colors_bulktypes) +
     labs(x = "Subtype (k = 4)", tag = "C")
 pD <- ggplot(everything) + geom_boxplot(mapping = aes(x = Subtype, y = Immune, fill = Dataset)) +
-    theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1)) +
+    theme(axis.text.x = element_text(angle = 30, vjust = 1, hjust = 1)) +
     scale_fill_manual(values = colors_bulktypes) +
     labs(x = "Subtype (k = 4)", tag = "D")
 

@@ -28,7 +28,7 @@ generate_barplot <- function(bulk_set, sc_set, title_tmp, taglet) {
   
   g <- ggplot(results_melt, mapping = aes(x=variable, y=value, fill=cell_type, color=cell_type)) +
     geom_bar(stat = "identity") +
-    labs(x="Sample", y="Proportion", fill="Cell type", colour="Cell type",
+    labs(x="Sample", y=ylab, fill="Cell type", colour="Cell type",
          tag = taglet, title = title_tmp) +
     theme(axis.text.x=element_blank(),
           axis.ticks.x=element_blank(),
