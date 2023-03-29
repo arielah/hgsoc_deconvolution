@@ -70,9 +70,7 @@ plot_weights <- function(ebd.res, name, tag) {
   as.ggplot(Heatmap(weights, left_annotation = row_ha, show_row_names = F,
           cluster_rows = F, cluster_columns = F, col = heatmap_scale_2d,
           heatmap_legend_param = list(title = " ", at = c(0,0.2,0.4,0.6,0.8,1)),
-          name = name,
-          column_names_rot = 45
-          )) +
+          name = name)) +
       labs(tag = tag) + ggtitle(name) + 
       theme(plot.title = element_text(hjust = 0.43))
 }
@@ -90,7 +88,7 @@ plot_gsva <- function(ebd.res, name, tag) {
     as.ggplot(Heatmap(gsva.es, col = heatmap_scale_2d, cluster_columns = F,
                       heatmap_legend_param = list(title = " ",
                                                   at = c(-1,-0.5,0,0.5,1)), 
-                      name = name, column_names_rot = 45,
+                      name = name,
                       row_names_gp = grid::gpar(fontsize = 10))) +
         labs(tag = tag) + ggtitle(name) + 
         theme(plot.title = element_text(hjust = 0.3))
