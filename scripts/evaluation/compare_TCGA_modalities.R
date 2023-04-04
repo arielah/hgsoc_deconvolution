@@ -33,6 +33,7 @@ rnaseq <- subset(rnaseq, select = c(common_samples))
 microarray <- subset(microarray, select = c(common_samples))
 
 # Calculate the pearson correlation between cell type estimates
+# Note we start at 2 to not have to remove the cell type names
 correlations <- numeric()
 for (i in 2:length(common_samples)){
   correlations[i - 1] <- cor(rnaseq[, ..i], microarray[, ..i])
@@ -62,7 +63,9 @@ melted_both <- left_join(melted_rna, melted_micro)
 ggplot(melted_both, mapping = aes(x = microarray, y = rnaseq, color = cell_type)) +
   geom_point() + geom_abline()
 
-# Calculate spearman correlation of individual cell types
+# Calculate spearman correlation of individual cell types; the Pearson values
+# weren't as high as we initially expected so we want to check that rank-order
+# is still preserved among the high-frequency cell types across platforms.
 rownames(rnaseq) <- rnaseq$cell_type; rnaseq$cell_type <- NULL
 rownames(microarray) <- microarray$cell_type; microarray$cell_type <- NULL
 

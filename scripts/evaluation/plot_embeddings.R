@@ -1,6 +1,6 @@
 # Script to plot data from generate_embeddings.R. We'll try it a couple of
 # different ways, using pheatmap's default clustering and also ordering based
-# on subtype cluster assignmentsu. We'll also use GSVA to compare expression
+# on subtype cluster assignments. We'll also use GSVA to compare expression
 # programs to existing (hallmark) gene sets.
 
 suppressPackageStartupMessages({
