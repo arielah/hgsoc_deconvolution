@@ -37,8 +37,6 @@ if (length(args) == 2) {
 bp <- readRDS(paste(local_data_path, "/deconvolution_output/", dataset,
                     "_default_bayesprism_results_full.rds", sep = ""))
 
-print("got here, yay!")
-
 # BP function to run embeddings, this is the part that takes ~1 day
 ebd.res <- learn.embedding.nmf(bp = bp, K = k, cycle = 40)
 
@@ -51,26 +49,3 @@ weights <- ebd.res$omega
 weights_file <- paste(local_data_path, "/embeddings/", dataset,
                       "_k", k, "_program_weights.tsv", sep = "")
 write.table(weights, weights_file, sep = "\t", quote = FALSE)
-
-# Load clustering annotations
-cluster_file <- paste(local_data_path, "cluster_assignments", "FullClusterMembership.csv", sep = "/")
-cluster_list <- fread(cluster_file)
-
-cluster_list$ClusterK4_kmeans <- recode(cluster_list$ClusterK4_kmeans,
-                                        "1" = "Mesenchymal",
-                                        "2" = "Proliferative",
-                                        "3" = "Immunoreactive",
-                                        "4" = "Differentiated")
-cluster_list <- subset(cluster_list, cluster_list$V1 %in% rownames(weights))
-
-annotation_row <- data.frame(
-  Full_kmeans = factor(cluster_list$ClusterK4_kmeans)
-)
-rownames(annotation_row) <- cluster_list$V1
-
-# Plot weights
-plotfile <- paste(plot_path, "/embedding_plots/", dataset,
-                  "_k", k, "_embedding_heatmap.png", sep = "")
-png(plotfile)
-pheatmap(weights, annotation_row = annotation_row, show_rownames = FALSE)
-dev.off()
