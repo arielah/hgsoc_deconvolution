@@ -13,7 +13,7 @@ data_path <- params$data_path
 local_data_path <- params$local_data_path
 plot_path <- params$plot_path
 
-# Current options are AACES and TCGA, will probably add more
+# Current options are TCGA (for RNA-seq), microarray, and tothill
 args <- commandArgs(trailingOnly = TRUE)
 if (length(args) == 1) {
 	print(args)
@@ -23,7 +23,7 @@ if (length(args) == 1) {
 print(dataset)
 
 # Load bayesprism object
-bp <- readRDS(paste(local_data_path, "/deconvolution_output/", dataset, 
+bp <- readRDS(paste(local_data_path, "/deconvolution_output/", dataset,
                        "_default_bayesprism_results_full.rds", sep = ""))
 
 # Get expression from only epithelial cell fraction
@@ -61,16 +61,16 @@ epithelium_umap$ClusterK4_kmeans <- recode(epithelium_umap$ClusterK4_kmeans,
                                            "4" = "Differentiated")
 
 # Plot UMAP
-png(paste(plot_path, "/evaluation_plots/", dataset, "_cancer_fraction_K2.png", sep = "")) 
-ggplot(data = epithelium_umap, mapping = aes(x = V1, y = V2, color = ClusterK2_kmeans)) + 
+png(paste(plot_path, "/evaluation_plots/", dataset, "_cancer_fraction_K2.png", sep = ""))
+ggplot(data = epithelium_umap, mapping = aes(x = V1, y = V2, color = ClusterK2_kmeans)) +
   geom_point() + ggtitle("Cancer Fraction Expression") + xlab("UMAP 1") + ylab("UMAP 2")
 dev.off()
 png(paste(plot_path, "/evaluation_plots/", dataset, "_cancer_fraction_K3.png", sep = ""))
-ggplot(data = epithelium_umap, mapping = aes(x = V1, y = V2, color = ClusterK3_kmeans)) + 
+ggplot(data = epithelium_umap, mapping = aes(x = V1, y = V2, color = ClusterK3_kmeans)) +
   geom_point() + ggtitle("Cancer Fraction Expression") + xlab("UMAP 1") + ylab("UMAP 2")
 dev.off()
 png(paste(plot_path, "/evaluation_plots/", dataset, "_cancer_fraction_K4.png", sep = ""))
-ggplot(data = epithelium_umap, mapping = aes(x = V1, y = V2, color = ClusterK4_kmeans)) + 
+ggplot(data = epithelium_umap, mapping = aes(x = V1, y = V2, color = ClusterK4_kmeans)) +
   geom_point() + ggtitle("Cancer Fraction Expression") + xlab("UMAP 1") + ylab("UMAP 2")
 dev.off()
 
@@ -88,14 +88,14 @@ epithelium_umap <- inner_join(epithelium_umap, epithelium_umap2)
 
 # Plot UMAP
 png(paste(plot_path, "/evaluation_plots/", dataset, "_cancer_fraction_seed2_K2.png", sep = ""))
-ggplot(data = epithelium_umap, mapping = aes(x = UMAP1, y = UMAP2, color = ClusterK2_kmeans)) + 
+ggplot(data = epithelium_umap, mapping = aes(x = UMAP1, y = UMAP2, color = ClusterK2_kmeans)) +
   geom_point() + ggtitle("Cancer Fraction Expression") + xlab("UMAP 1") + ylab("UMAP 2")
 dev.off()
 png(paste(plot_path, "/evaluation_plots/", dataset, "_cancer_fraction_seed2_K3.png", sep = ""))
-ggplot(data = epithelium_umap, mapping = aes(x = UMAP1, y = UMAP2, color = ClusterK3_kmeans)) + 
+ggplot(data = epithelium_umap, mapping = aes(x = UMAP1, y = UMAP2, color = ClusterK3_kmeans)) +
   geom_point() + ggtitle("Cancer Fraction Expression") + xlab("UMAP 1") + ylab("UMAP 2")
 dev.off()
 png(paste(plot_path, "/evaluation_plots/", dataset, "_cancer_fraction_seed2_K4.png", sep = ""))
-ggplot(data = epithelium_umap, mapping = aes(x = UMAP1, y = UMAP2, color = ClusterK4_kmeans)) + 
+ggplot(data = epithelium_umap, mapping = aes(x = UMAP1, y = UMAP2, color = ClusterK4_kmeans)) +
   geom_point() + ggtitle("Cancer Fraction Expression") + xlab("UMAP 1") + ylab("UMAP 2")
 dev.off()
