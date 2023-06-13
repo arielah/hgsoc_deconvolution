@@ -32,13 +32,9 @@ generate_barplot <- function(bulk_set, sc_set, title_tmp, taglet) {
          tag = taglet, title = title_tmp) +
     theme(axis.text.x=element_blank(),
           axis.ticks.x=element_blank(),
-          axis.text.y=element_blank(),
-          axis.ticks.y=element_blank(),
           panel.background = element_blank(),
           axis.title.x = element_text(vjust = 1)
     ) +
-    scale_x_discrete(expand = c(0, 0)) +
-    scale_y_discrete(expand = c(0, 0)) +
     scale_fill_manual(values = colors_celltypes) +
     scale_color_manual(values = colors_celltypes)
   
