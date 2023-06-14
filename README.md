@@ -6,7 +6,7 @@ Ever since the first TCGA paper on the subject came out in 2011, high-grade sero
 
 To see if there are differences in the cell type composition of the HGSOC subtypes, we estimated cell type profiles for several large bulk transcriptomic datasets using a deconvolution method called BayesPrism. We chose to use BayesPrism based on results from our [pilot study](https://github.com/greenelab/deconvolution_pilot). As an example, we found the following cell type proportions in the RNA-seq data from TCGA:
 
-![](https://github.com/arielah/hgsoc_deconvolution/blob/prepublic/figures/readme_figure.png)
+![](https://github.com/greenelab/hgsoc_deconvolution/blob/main/figures/readme_figure.png)
 
 We then compared cell type info across subtype assignments at k = 3 and k = 4. We looked for a relationship between cell type proportions and survival/other clinical factors. Finally, we ran nonnegative matrix factorization (NMF) on the cancer fraction, to see if there were distinct cancer expression profiles across subtypes.
 
@@ -20,7 +20,7 @@ The bulk data and associated covariates are all publicly available: we recommend
 
 ## Repository layout
 
-A description of all scripts in this repository is available [here](https://github.com/arielah/hgsoc_deconvolution/tree/prepublic/scripts).
+A description of all scripts in this repository is available [here](https://github.com/greenelab/hgsoc_deconvolution/tree/main/scripts).
 
 ## Citation
 
