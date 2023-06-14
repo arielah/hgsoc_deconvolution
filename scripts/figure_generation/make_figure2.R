@@ -39,43 +39,47 @@ microarray_vazquez <- load_dataset("microarray", "vazquez")
 tothill_vazquez <- load_dataset("tothill", "vazquez")
 
 tcga <- full_join(tcga_ours, tcga_vazquez)
-pA <- ggplot(tcga, mapping = aes(x=fibro, y=vazquez, color=cell_type)) + 
+pA <- ggplot(tcga, mapping = aes(x = fibro, y = vazquez, color = cell_type)) + 
   geom_point(size = 0.8) + geom_abline() +
-  labs(x="Proportions with HGSOC Penn/Utah reference", 
-       y="Proportions with Vázquez-García reference",
+  scale_color_manual(values = colors_celltypes) +
+  labs(x = "Proportions with HGSOC Penn/Utah reference", 
+       y = "Proportions with Vázquez-García reference",
        title = "TCGA RNA-seq",
-       color="Cell type", tag = "A")
+       color = "Cell type", tag = "A")
 
 
 microarray <- full_join(microarray_ours, microarray_vazquez)
-pB <- ggplot(microarray, mapping = aes(x=fibro, y=vazquez, color=cell_type)) +
+pB <- ggplot(microarray, mapping = aes(x = fibro, y = vazquez, color = cell_type)) +
   geom_point(size = 0.8) + geom_abline() +
-  labs(x="Proportions with HGSOC Penn/Utah reference", 
-       y="Proportions with Vázquez-García reference",
+  scale_color_manual(values = colors_celltypes) +
+  labs(x = "Proportions with HGSOC Penn/Utah reference", 
+       y = "Proportions with Vázquez-García reference",
        title = "TCGA Microarray",
-       color="Cell type", tag = "B")
+       color = "Cell type", tag = "B")
 
 tothill <- full_join(tothill_ours, tothill_vazquez)
-pC <- ggplot(tothill, mapping = aes(x=fibro, y=vazquez, color=cell_type)) +
+pC <- ggplot(tothill, mapping = aes(x = fibro, y = vazquez, color = cell_type)) +
   geom_point(size = 0.8) + geom_abline() +
-  labs(x="Proportions with HGSOC Penn/Utah reference", 
-       y="Proportions with Vázquez-García reference",
+  scale_color_manual(values = colors_celltypes) +
+  labs(x = "Proportions with HGSOC Penn/Utah reference", 
+       y = "Proportions with Vázquez-García reference",
        title = "Tothill",
-       color="Cell type", tag = "C")
+       color = "Cell type", tag = "C")
 
 # Compare TCGA and microarray
 
-tcga_ours$variable <- gsub("-","\\.", tcga_ours$variable)
+tcga_ours$variable <- gsub("-", "\\.", tcga_ours$variable)
 tcga_ours$variable <- str_extract(tcga_ours$variable, "TCGA.\\w\\w.\\w\\w\\w\\w")
 
 setnames(tcga_ours, "fibro", "rnaseq")
 setnames(microarray_ours, "fibro", "microarray")
 
 tcga_both <- inner_join(tcga_ours, microarray_ours)
-pD <- ggplot(tcga_both, mapping = aes(x=microarray, y=rnaseq, color=cell_type)) +
+pD <- ggplot(tcga_both, mapping = aes(x = microarray, y = rnaseq, color = cell_type)) +
   geom_point(size = 0.8) + geom_abline() +
-  labs(x="TCGA Microarray Proportions", y="TCGA RNA-seq Proportions",
-       color="Cell type", tag = "D",
+  scale_color_manual(values = colors_celltypes) +
+  labs(x = "TCGA Microarray Proportions", y = "TCGA RNA-seq Proportions",
+       color = "Cell type", tag = "D",
        title = "Cross-plaform comparison")
 
 pdf(paste(figure_path, "figure2.pdf", sep = "/"), width = 16, height = 12, family = "sans")

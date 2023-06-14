@@ -71,13 +71,13 @@ kaplan_meier <- function(data, title, tag) {
     data$high_fibro <- ifelse(data$Fibroblasts > q3, "High fibroblast", "Other")
     
     km <- Surv(data$months, data$vital)
-    km_treatment<-survfit(km~high_fibro,data=data,type='kaplan-meier',conf.type='log')
+    km_treatment<-survfit(km~high_fibro, data = data, type = 'kaplan-meier', conf.type = 'log')
     
     autoplot(km_treatment, conf.int = F) +
-        labs(x="Time since diagnosis (months)", y = "Survival",
+        labs(x = "Time since diagnosis (months)", y = "Survival",
              title = title, tag = tag) +
-        theme(legend.title=element_blank()) +
-        scale_color_manual(values=c("#ED0000","#00AAB4"))
+        theme(legend.title = element_blank()) +
+        scale_color_manual(values = c("#F8766D", "#B79F00"))
     }
 
 pA <- kaplan_meier(tcga, "TCGA RNA-seq", "A")
@@ -90,17 +90,22 @@ top <- pA + pB + pC + pD + plot_layout(nrow = 2, guides = "collect")
 
 surgery <- subset(composition, !is.na(composition$debulking))
 
-pE <- ggplot(surgery, mapping = aes(y=Fibroblasts, x=dataset, fill=debulking)) +
-    geom_boxplot(notch=TRUE) +
-    scale_fill_manual(values = c("#42B450", "#925E9F")) +
-    labs(x="Dataset", fill="Debulking status", tag="E")
+surgery$dataset <- recode(surgery$dataset,
+                          "microarray" = "TCGA Microarray",
+                          "TCGA" = "TCGA RNA-seq",
+                          "tothill" = "Tothill")
 
-pF <- ggplot(surgery, mapping = aes(y=Immune, x=dataset, fill=debulking)) +
-    geom_boxplot(notch=TRUE) +
-    scale_fill_manual(values = c("#42B450", "#925E9F")) +
-    labs(x="Dataset", fill="Debulking status", tag="F")
+pE <- ggplot(surgery, mapping = aes(y = Fibroblasts, x = dataset, fill = debulking)) +
+    geom_boxplot(notch = TRUE) +
+    scale_fill_manual(values = c("#39B600", "#00B0F6")) +
+    labs(x = "Dataset", fill = "Debulking status", tag = "E")
 
-bottom <- pE + pF + plot_layout(guides="collect")
+pF <- ggplot(surgery, mapping = aes(y = Immune, x = dataset, fill = debulking)) +
+    geom_boxplot(notch = TRUE) +
+    scale_fill_manual(values = c("#39B600", "#00B0F6")) +
+    labs(x = "Dataset", fill = "Debulking status", tag = "F")
+
+bottom <- pE + pF + plot_layout(guides = "collect")
 
 pdf(paste(figure_path, "figure4.pdf", sep = "/"), width = 12, height = 14, family = "sans")
 top / bottom + plot_layout(heights = c(2, 1))
@@ -114,11 +119,10 @@ plot_histogram <- function(data, bulk_set, cell_type, lab) {
         data$celltype <- data$Immune
     }
     quantiles <- quantile(data$celltype)
-    q1 <- quantiles[2]
-    median <- quantiles[3]
     q3 <- quantiles[4]
+    print(q3)
     
-    ggplot(data, mapping = aes(x=celltype))  + geom_histogram() +
+    ggplot(data, mapping = aes(x = celltype))  + geom_histogram() +
         geom_vline(xintercept = q3, linetype = "dashed", color = "red") +
         labs(title = bulk_set, tag = lab, x = cell_type, y = "Count")
 }
@@ -133,4 +137,31 @@ qF <- plot_histogram(tothill, "Tothill", "Immune", "F")
 
 pdf(paste(figure_path, "suppfig1.pdf", sep = "/"), width = 18, height = 12, family = "sans")
 qA + qB + qC + qD + qE + qF + plot_layout(nrow = 2)
+dev.off()
+
+
+kaplan_meier_immune <- function(data, title, tag) {
+    quantiles <- quantile(data$Immune)
+    q1 <- quantiles[2]
+    median <- quantiles[3]
+    q3 <- quantiles[4]
+    data$high_immune <- ifelse(data$Immune > q3, "High immune", "Other")
+
+    km <- Surv(data$months, data$vital)
+    km_treatment<-survfit(km~high_immune, data = data, type = 'kaplan-meier', conf.type = 'log')
+
+    autoplot(km_treatment, conf.int = F) +
+        labs(x = "Time since diagnosis (months)", y = "Survival",
+             title = title, tag = tag) +
+        theme(legend.title = element_blank()) +
+        scale_color_manual(values = c("#F8766D", "#B79F00"))
+}
+
+rA <- kaplan_meier_immune(tcga, "TCGA RNA-seq", "A")
+rB <- kaplan_meier_immune(microarray, "TCGA Microarray", "B")
+rC <- kaplan_meier_immune(tothill, "Tothill", "C")
+rD <- kaplan_meier_immune(composition, "All Datasets", "D")
+
+pdf(paste(figure_path, "suppfig2.pdf", sep = "/"), width = 12, height = 9.3, family = "sans")
+rA + rB + rC + rD + plot_layout(nrow = 2, guides = "collect")
 dev.off()

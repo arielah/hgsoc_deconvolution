@@ -31,7 +31,7 @@ load_datasets <- function() {
     
     if(bulk_set == "TCGA") {
       colnames(results) <- str_extract(colnames(results), "TCGA-\\w\\w-\\w\\w\\w\\w")
-      colnames(results) <- gsub("-","\\.", colnames(results))
+      colnames(results) <- gsub("-", "\\.", colnames(results))
     }
     
     cell_types <- results$cell_type
@@ -121,9 +121,9 @@ sankey_plot <- function(everything, bulk_set) {
   dataset <- subset(everything, everything$Dataset == bulk_set)
   df <- dataset %>% make_long(ClusterK2_kmeans, ClusterK3_kmeans, Subtype) %>%
       dplyr::mutate(
-          node = factor(node, levels = c(1, 2, 3, "Mesenchymal","Proliferative",
+          node = factor(node, levels = c(1, 2, 3, "Mesenchymal", "Proliferative",
                                          "Immunoreactive", "Differentiated")),
-          next_node = factor(next_node, levels = c(1, 2, 3, "Mesenchymal","Proliferative",
+          next_node = factor(next_node, levels = c(1, 2, 3, "Mesenchymal", "Proliferative",
                                                    "Immunoreactive", "Differentiated"))
       )
   df$x <- recode(df$x,
@@ -141,20 +141,20 @@ sankey_plot <- function(everything, bulk_set) {
                   node.color = "gray30") +
       scale_fill_manual(values = colors_subtypes) + 
       geom_sankey_label(size = 3, color = "white", fill = "gray40") +
-      theme(axis.text.y=element_blank(),
-            axis.ticks=element_blank(),
+      theme(axis.text.y = element_blank(),
+            axis.ticks = element_blank(),
             axis.title.x = element_blank(),
             panel.grid = element_blank(),
             legend.position = "none") +
       ggtitle(bulk_set)
 }
 
-pI <- sankey_plot(everything, "TCGA RNA-seq") + labs(tag="I")
-pJ <- sankey_plot(everything, "TCGA Microarray") + labs(tag="J")
-pK <- sankey_plot(everything, "Tothill") + labs(tag="K")
+pI <- sankey_plot(everything, "TCGA RNA-seq") + labs(tag = "I")
+pJ <- sankey_plot(everything, "TCGA Microarray") + labs(tag = "J")
+pK <- sankey_plot(everything, "Tothill") + labs(tag = "K")
 
 bottom <- pI + pJ + pK + plot_layout(guides = "collect")
 
 pdf(paste(figure_path, "figure3.pdf", sep = "/"), width = 16, height = 12, family = "sans")
-top / middle / bottom + plot_layout(nrow=3, heights = c(4.5, 4.5, 3))
+top / middle / bottom + plot_layout(nrow = 3, heights = c(4.5, 4.5, 3))
 dev.off()

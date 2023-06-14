@@ -1,0 +1,276 @@
+---
+title: "HGSOC Survival"
+author: "Ariel Hippen"
+date: '2023-02-18'
+output:
+  pdf_document:
+    toc: yes
+    toc_depth: '4'
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+In first_*_analysis.Rmd, we did a preliminary survival analysis of how fibroblast content affects survival, but with the simplest model possible. Here, we will redo that analysis but considering important covariates like age and tumor stage. 
+
+```{r packages}
+suppressPackageStartupMessages({
+    library(data.table)
+    library(SingleCellExperiment)
+    library(dplyr)
+    library(yaml)
+    library(stringr)
+    library(ggplot2)
+    library(survival)
+    library(ggfortify)
+})
+
+params <- read_yaml("../../config.yml")
+data_path <- params$data_path
+local_data_path <- params$local_data_path
+plot_path <- params$plot_path
+```
+
+## Load data
+
+```{r}
+microarray_t <- fread(paste(local_data_path, "deconvolution_output",
+                     "microarray_default_bayesprism_results.tsv", sep = "/"))
+tcga_t <- fread(paste(local_data_path, "deconvolution_output",
+                     "TCGA_default_bayesprism_results.tsv", sep = "/"))
+tothill_t <- fread(paste(local_data_path, "deconvolution_output",
+                     "tothill_default_bayesprism_results.tsv", sep = "/"))
+```
+
+```{r}
+# Switch so cell types are columns and samples are rows for easier analysis
+cell_types <- microarray_t$cell_type
+
+microarray_t$cell_type <- NULL
+microarray <- t(as.matrix(microarray_t))
+colnames(microarray) <- cell_types
+microarray <- as.data.frame(microarray)
+microarray <- cbind(rownames(microarray), microarray)
+setnames(microarray, "rownames(microarray)", "ID")
+microarray$dataset <- "microarray"
+
+tcga_t$cell_type <- NULL
+tcga <- t(as.matrix(tcga_t))
+colnames(tcga) <- cell_types
+tcga <- as.data.frame(tcga)
+tcga <- cbind(rownames(tcga), tcga)
+setnames(tcga, "rownames(tcga)", "ID")
+tcga$dataset <- "TCGA"
+
+tothill_t$cell_type <- NULL
+tothill <- t(as.matrix(tothill_t))
+colnames(tothill) <- cell_types
+tothill <- as.data.frame(tothill)
+tothill <- cbind(rownames(tothill), tothill)
+setnames(tothill, "rownames(tothill)", "ID")
+tothill$dataset <- "tothill"
+
+rm(microarray_t, tcga_t, tothill_t); gc()
+```
+
+```{r}
+tcga$ID <- str_extract(tcga$ID, "TCGA-\\w\\w-\\w\\w\\w\\w")
+tcga$ID <- gsub("-", "\\.", tcga$ID)
+```
+
+
+```{r}
+# Combine cell type info into one object to run combined survival analysis
+composition <- rbind(microarray, tcga, tothill)
+
+composition$Immune <- composition$`T cells`+composition$Macrophages+composition$Monocytes+
+    composition$`Plasma cells` + composition$DC + composition$`NK cells` + composition$pDC +
+    composition$`B cells` + composition$ILC + composition$`Mast cells`
+```
+
+```{r}
+covariates <- fread(paste(local_data_path, "cluster_assignments",
+                          "AnalSet.csv", sep = "/"))
+covariates$V1 <- NULL
+setnames(covariates, "sampleid", "ID")
+
+covariates$debulking <- recode(covariates$debulking,
+                               "Optimal" = "optimal",
+                               "Suboptimal" = "suboptimal")
+
+composition <- inner_join(composition, covariates)
+```
+
+## TCGA microarray
+
+```{r}
+microarray <- subset(composition, composition$dataset=="microarray")
+```
+
+
+```{r}
+# Discretize fibroblast and immune estimates
+quantiles <- quantile(microarray$Fibroblasts)
+q1 <- quantiles[2]
+median <- quantiles[3]
+q3 <- quantiles[4]
+microarray$high_fibro <- ifelse(microarray$Fibroblasts > q3, 1, 0)
+
+quantiles <- quantile(microarray$Immune)
+q1 <- quantiles[2]
+median <- quantiles[3]
+q3 <- quantiles[4]
+microarray$high_immune <- ifelse(microarray$Immune > q3, 1, 0)
+```
+
+```{r}
+# Basic analysis
+model <- coxph(Surv(months, vital) ~ factor(high_fibro), microarray)
+summary(model)
+
+model <- coxph(Surv(months, vital) ~ factor(high_immune), microarray)
+summary(model)
+```
+
+```{r}
+# Analysis with covariates
+model <- coxph(Surv(months, vital) ~ (factor(high_fibro) + factor(age)+
+                                        factor(debulking)+ factor(FewerStage)), microarray)
+summary(model)
+
+model <- coxph(Surv(months, vital) ~ (factor(high_immune) + factor(age)+
+                                        factor(debulking)+ factor(FewerStage)), microarray)
+summary(model)
+```
+
+## TCGA RNA-seq
+
+```{r}
+tcga <- subset(composition, composition$dataset=="TCGA")
+```
+
+
+```{r}
+# Discretize fibroblast and immune estimates
+quantiles <- quantile(tcga$Fibroblasts)
+q1 <- quantiles[2]
+median <- quantiles[3]
+q3 <- quantiles[4]
+tcga$high_fibro <- ifelse(tcga$Fibroblasts > q3, 1, 0)
+
+quantiles <- quantile(tcga$Immune)
+q1 <- quantiles[2]
+median <- quantiles[3]
+q3 <- quantiles[4]
+tcga$high_immune <- ifelse(tcga$Immune > q3, 1, 0)
+```
+
+```{r}
+# Basic analysis
+model <- coxph(Surv(months, vital) ~ factor(high_fibro), tcga)
+summary(model)
+
+model <- coxph(Surv(months, vital) ~ factor(high_immune), tcga)
+summary(model)
+```
+
+```{r}
+# Analysis with covariates
+model <- coxph(Surv(months, vital) ~ (factor(high_fibro) + factor(age)+
+                                        factor(debulking)+ factor(FewerStage)), tcga)
+summary(model)
+
+model <- coxph(Surv(months, vital) ~ (factor(high_immune) + factor(age)+
+                                        factor(debulking)+ factor(FewerStage)), tcga)
+summary(model)
+```
+
+
+## Tothill
+
+```{r}
+tothill <- subset(composition, composition$Dataset=="Tothill")
+```
+
+```{r}
+# Discretize fibroblast and immune estimates
+quantiles <- quantile(tothill$Fibroblasts)
+q1 <- quantiles[2]
+median <- quantiles[3]
+q3 <- quantiles[4]
+tothill$high_fibro <- ifelse(tothill$Fibroblasts > q3, 1, 0)
+
+quantiles <- quantile(tothill$Immune)
+q1 <- quantiles[2]
+median <- quantiles[3]
+q3 <- quantiles[4]
+tothill$high_immune <- ifelse(tothill$Immune > q3, 1, 0)
+```
+
+```{r}
+# Basic analysis
+model <- coxph(Surv(months, vital) ~ factor(high_fibro), tothill)
+summary(model)
+
+model <- coxph(Surv(months, vital) ~ factor(high_immune), tothill)
+summary(model)
+```
+
+```{r}
+# Analysis with covariates
+model <- coxph(Surv(months, vital) ~ (factor(high_fibro) + factor(age)+
+                                        factor(debulking)+ factor(FewerStage)), tothill)
+summary(model)
+
+model <- coxph(Surv(months, vital) ~ (factor(high_immune) + factor(age)+
+                                        factor(debulking)+ factor(FewerStage)), tothill)
+summary(model)
+```
+
+## All
+
+```{r}
+# Discretize fibroblast and immune estimates
+quantiles <- quantile(composition$Fibroblasts)
+q1 <- quantiles[2]
+median <- quantiles[3]
+q3 <- quantiles[4]
+composition$high_fibro <- ifelse(composition$Fibroblasts > q3, 1, 0)
+
+quantiles <- quantile(composition$Immune)
+q1 <- quantiles[2]
+median <- quantiles[3]
+q3 <- quantiles[4]
+composition$high_immune <- ifelse(composition$Immune > q3, 1, 0)
+```
+
+```{r}
+# Basic analysis
+model <- coxph(Surv(months, vital) ~ factor(high_fibro), composition)
+summary(model)
+
+model <- coxph(Surv(months, vital) ~ factor(high_immune), composition)
+summary(model)
+```
+
+```{r}
+# Analysis with covariates
+model <- coxph(Surv(months, vital) ~ (factor(high_fibro) + factor(age)+
+                                        factor(debulking)+ factor(FewerStage)), composition)
+summary(model)
+
+model <- coxph(Surv(months, vital) ~ (factor(high_immune) + factor(age)+
+                                        factor(debulking)+ factor(FewerStage)), composition)
+summary(model)
+```
+
+```{r}
+# Kaplan Meier plot for all datasets
+km <- Surv(composition$months, composition$vital)
+km_treatment<-survfit(km~high_immune,data=composition,type='kaplan-meier',conf.type='log')
+
+autoplot(km_treatment)
+```
+
+Looks like high fibroblast content is associated with worse survival. It doesn't hit statistical significance most of the time, but the results do seem on the same scale as what Mollie saw of the effect of subtypes on survival (https://github.com/greenelab/hgsc_characterization/blob/master/figure_notebooks/survival_figs/survival_analyses.R). It's obviously not going to matter as much as stage or age, but it's still important to consider.
