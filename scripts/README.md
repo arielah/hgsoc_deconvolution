@@ -4,7 +4,7 @@
 This directory contains R scripts for manually annotating our single cell data using a combination of unsupervised clustering and [CellTypist](https://www.celltypist.org/). 
 
 ## preprocess_data
-This directory contains for preprocessing single-cell and bulk data for deconvolution, as well as preparing clinical covariate data for later evaluations. It includes scripts to:
+This directory contains R scripts for preprocessing single-cell and bulk data for deconvolution, as well as preparing clinical covariate data for later evaluations. It includes scripts to:
 
 - Merge all HGSOC Penn/Utah datasets into one file
 - Randomly downsample the Vázquez-Garcia data into a workable size for BayesPrism

@@ -71,13 +71,13 @@ kaplan_meier <- function(data, title, tag) {
     data$high_fibro <- ifelse(data$Fibroblasts > q3, "High fibroblast", "Other")
     
     km <- Surv(data$months, data$vital)
-    km_treatment<-survfit(km~high_fibro,data=data,type='kaplan-meier',conf.type='log')
+    km_treatment<-survfit(km~high_fibro, data = data, type = 'kaplan-meier', conf.type = 'log')
     
     autoplot(km_treatment, conf.int = F) +
-        labs(x="Time since diagnosis (months)", y = "Survival",
+        labs(x = "Time since diagnosis (months)", y = "Survival",
              title = title, tag = tag) +
-        theme(legend.title=element_blank()) +
-        scale_color_manual(values=c("#F8766D","#B79F00"))
+        theme(legend.title = element_blank()) +
+        scale_color_manual(values = c("#F8766D", "#B79F00"))
     }
 
 pA <- kaplan_meier(tcga, "TCGA RNA-seq", "A")
@@ -95,17 +95,17 @@ surgery$dataset <- recode(surgery$dataset,
                           "TCGA" = "TCGA RNA-seq",
                           "tothill" = "Tothill")
 
-pE <- ggplot(surgery, mapping = aes(y=Fibroblasts, x=dataset, fill=debulking)) +
-    geom_boxplot(notch=TRUE) +
+pE <- ggplot(surgery, mapping = aes(y = Fibroblasts, x = dataset, fill = debulking)) +
+    geom_boxplot(notch = TRUE) +
     scale_fill_manual(values = c("#39B600", "#00B0F6")) +
-    labs(x="Dataset", fill="Debulking status", tag="E")
+    labs(x = "Dataset", fill = "Debulking status", tag = "E")
 
-pF <- ggplot(surgery, mapping = aes(y=Immune, x=dataset, fill=debulking)) +
-    geom_boxplot(notch=TRUE) +
+pF <- ggplot(surgery, mapping = aes(y = Immune, x = dataset, fill = debulking)) +
+    geom_boxplot(notch = TRUE) +
     scale_fill_manual(values = c("#39B600", "#00B0F6")) +
-    labs(x="Dataset", fill="Debulking status", tag="F")
+    labs(x = "Dataset", fill = "Debulking status", tag = "F")
 
-bottom <- pE + pF + plot_layout(guides="collect")
+bottom <- pE + pF + plot_layout(guides = "collect")
 
 pdf(paste(figure_path, "figure4.pdf", sep = "/"), width = 12, height = 14, family = "sans")
 top / bottom + plot_layout(heights = c(2, 1))
@@ -122,7 +122,7 @@ plot_histogram <- function(data, bulk_set, cell_type, lab) {
     q3 <- quantiles[4]
     print(q3)
     
-    ggplot(data, mapping = aes(x=celltype))  + geom_histogram() +
+    ggplot(data, mapping = aes(x = celltype))  + geom_histogram() +
         geom_vline(xintercept = q3, linetype = "dashed", color = "red") +
         labs(title = bulk_set, tag = lab, x = cell_type, y = "Count")
 }
@@ -148,13 +148,13 @@ kaplan_meier_immune <- function(data, title, tag) {
     data$high_immune <- ifelse(data$Immune > q3, "High immune", "Other")
 
     km <- Surv(data$months, data$vital)
-    km_treatment<-survfit(km~high_immune,data=data,type='kaplan-meier',conf.type='log')
+    km_treatment<-survfit(km~high_immune, data = data, type = 'kaplan-meier', conf.type = 'log')
 
     autoplot(km_treatment, conf.int = F) +
-        labs(x="Time since diagnosis (months)", y = "Survival",
+        labs(x = "Time since diagnosis (months)", y = "Survival",
              title = title, tag = tag) +
-        theme(legend.title=element_blank()) +
-        scale_color_manual(values=c("#F8766D","#B79F00"))
+        theme(legend.title = element_blank()) +
+        scale_color_manual(values = c("#F8766D", "#B79F00"))
 }
 
 rA <- kaplan_meier_immune(tcga, "TCGA RNA-seq", "A")

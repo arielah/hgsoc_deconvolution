@@ -33,13 +33,8 @@ make_heatmap <- function(dataset, k) {
   thing <- dataset$consensus[[k-1]]
   as.ggplot(Heatmap(thing, show_column_names = F, show_row_names = F,
                     heatmap_legend_param = list(title = " "),
-<<<<<<< HEAD:scripts/figure_generation/make_suppfig3.R
                     show_column_dend = F, show_row_dend = F, col = heatmap_scale_2d)) +
       ggtitle(paste("k = ", k, sep = "")) + easy_center_title()
-
-=======
-                    show_column_dend = F, show_row_dend = F))
->>>>>>> 91ac905c3e97e2a63a936b95a0d22b9eba81ba61:scripts/figure_generation/make_suppfig2.R
 }
 
 make_cophenetic <- function(dataset) {
